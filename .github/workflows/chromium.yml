@@ -8,6 +8,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check disk space
+        run: df -h
+
+      - name: Remove extra software
+        run: |
+          sudo apt-get purge -y firefox
+          sudo rm -rf /usr/local/share/chromium
+          sudo apt-get purge -y mongodb-org
+          sudo apt-get purge -y apache2
+          sudo rm -rf /usr/share/swift
+          sudo apt-get purge -y moby-engine moby-cli moby-buildx moby-compose
+          sudo apt-get purge -y podman buildah skopeo
+          sudo apt-get purge -y esl-erlang
+          sudo rm -rf /usr/local/bin/rebar3
+
+      - name: Check disk space
+        run: df -h
+
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
@@ -29,28 +47,31 @@ jobs:
           cd chromium
           fetch --nohooks chromium
 
+      - name: Check disk space
+        run: df -h
+
       - name: Install build deps
         run: |
           export PATH="$PATH:$PWD/depot_tools"
-          cd chromium
+          cd chromium/src
           ./build/install-build-deps.sh
 
       - name: gclient runhooks
         run: |
           export PATH="$PATH:$PWD/depot_tools"
-          cd chromium
+          cd chromium/src
           gclient runhooks
 
       - name: Generate default config
         run: |
           export PATH="$PATH:$PWD/depot_tools"
-          cd chromium
+          cd chromium/src
           gn gen out/Default
 
       - name: Build
         run: |
           export PATH="$PATH:$PWD/depot_tools"
-          cd chromium
+          cd chromium/src
           autoninja -C out/Default chrome
 
       - uses: actions/upload-artifact@v2
