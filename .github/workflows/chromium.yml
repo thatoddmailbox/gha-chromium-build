@@ -43,6 +43,9 @@ jobs:
           sudo rm -rf /usr/local/bin/lein
           sudo apt-get purge -y mercurial
           sudo apt-get purge -y mono-complete nuget
+          sudo apt-add-repository ppa:ondrej/php -y
+          sudo apt-get update
+          sudo apt-get install php7.4-cgi
 
       - name: Check disk space
         run: df -h
@@ -76,6 +79,9 @@ jobs:
           export PATH="$PATH:$PWD/depot_tools"
           cd chromium/src
           ./build/install-build-deps.sh
+
+      - name: Check disk space
+        run: df -h
 
       - name: gclient runhooks
         run: |
