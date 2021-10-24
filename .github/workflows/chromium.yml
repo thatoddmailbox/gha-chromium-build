@@ -1,0 +1,51 @@
+name: Build Chromium
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Fetch depot_tools
+        run: git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+
+      - name: Fetch Chromium source
+        run: |
+          export PATH="$PATH:$PWD/depot_tools"
+          mkdir chromium
+          cd chromium
+          fetch --nohooks chromium
+
+      - name: Install build deps
+        run: |
+          export PATH="$PATH:$PWD/depot_tools"
+          cd chromium
+          ./build/install-build-deps.sh
+
+      - name: gclient runhooks
+        run: |
+          export PATH="$PATH:$PWD/depot_tools"
+          cd chromium
+          gclient runhooks
+
+      - name: Generate default config
+        run: |
+          export PATH="$PATH:$PWD/depot_tools"
+          cd chromium
+          gn gen out/Default
+
+      - name: Build
+        run: |
+          export PATH="$PATH:$PWD/depot_tools"
+          cd chromium
+          autoninja -C out/Default chrome
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: out/Default
+          path: chromium/src/out/Default
+
