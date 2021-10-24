@@ -45,7 +45,7 @@ jobs:
           sudo apt-get purge -y mono-complete nuget
           sudo apt-add-repository ppa:ondrej/php -y
           sudo apt-get update
-          sudo apt-get install php7.4-cgi
+          sudo apt-get install libapache2-mod-php7.4 php7.4-cgi
 
       - name: Check disk space
         run: df -h
