@@ -89,10 +89,13 @@ jobs:
           cd chromium/src
           gclient runhooks
 
-      - name: Generate default config
+      - name: Set build config
         run: |
           export PATH="$PATH:$PWD/depot_tools"
           cd chromium/src
+          gn gen out/Default
+          echo "enable_nacl=false" >> out/Default/args.gn
+          echo "symbol_level=1" >> out/Default/args.gn
           gn gen out/Default
 
       - name: Build
